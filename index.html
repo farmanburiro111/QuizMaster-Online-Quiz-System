@@ -1,0 +1,733 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizMaster - Online Quiz System</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+header {
+    background: #101b3d;
+    color: white;
+    padding: 20px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.logo span { color: #38bdf8; }
+
+header small { color: #cbd5e1; }
+
+.container {
+    max-width: 1050px;
+    margin: 35px auto;
+    padding: 0 20px;
+}
+
+.hero {
+    background: linear-gradient(120deg, #172554, #2563eb);
+    color: white;
+    padding: 38px;
+    border-radius: 18px;
+    margin-bottom: 25px;
+}
+
+.hero h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.hero p { color: #dbeafe; }
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat, .card {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px #0f172a0d;
+}
+
+.stat h2 {
+    color: #2563eb;
+    font-size: 27px;
+}
+
+.stat p { color: #64748b; }
+
+.section-title {
+    margin: 25px 0 15px;
+}
+
+.subjects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.subject {
+    background: white;
+    padding: 23px;
+    border-radius: 15px;
+    border: 1px solid #e2e8f0;
+    transition: .2s;
+}
+
+.subject:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px #0f172a15;
+}
+
+.subject .emoji { font-size: 35px; }
+
+.subject h3 { margin: 12px 0 7px; }
+
+.subject p {
+    color: #64748b;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+button:hover { background: #1d4ed8; }
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.secondary {
+    background: #64748b;
+}
+
+.secondary:hover { background: #475569; }
+
+.danger { background: #dc2626; }
+
+.hidden { display: none !important; }
+
+#quizScreen, #resultScreen, #adminScreen, #leaderboardScreen {
+    display: none;
+}
+
+.quiz-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.timer {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 10px 17px;
+    border-radius: 9px;
+    font-weight: bold;
+}
+
+.progress-bg {
+    background: #e2e8f0;
+    height: 9px;
+    border-radius: 10px;
+    margin: 15px 0 25px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0;
+    background: #2563eb;
+    transition: .3s;
+}
+
+#questionText {
+    font-size: 22px;
+    margin-bottom: 22px;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #f8fafc;
+    color: #1e293b;
+    border: 2px solid #e2e8f0;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+}
+
+.option:hover {
+    background: #eff6ff;
+    border-color: #2563eb;
+}
+
+.option.selected {
+    background: #dbeafe;
+    border-color: #2563eb;
+}
+
+.quiz-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.result-score {
+    font-size: 55px;
+    color: #2563eb;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+label { font-weight: 600; }
+
+.admin-question {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 13px 0;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 13px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th { background: #eff6ff; }
+
+footer {
+    text-align: center;
+    color: #64748b;
+    padding: 25px;
+    margin-top: 35px;
+}
+
+@media(max-width:600px) {
+    .hero { padding: 25px; }
+    .hero h1 { font-size: 25px; }
+    header { padding: 17px 5%; }
+    #questionText { font-size: 19px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Quiz<span>Master.</span></div>
+    <small>Online Quiz Management System</small>
+</header>
+
+<main class="container">
+
+<!-- HOME -->
+<section id="homeScreen">
+    <div class="hero">
+        <h1>Test Your Knowledge! 🎓</h1>
+        <p>Learn, practice and improve your skills with interactive quizzes.</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <h2 id="totalQuizzes">0</h2>
+            <p>Quizzes Available</p>
+        </div>
+        <div class="stat">
+            <h2 id="totalQuestions">0</h2>
+            <p>Total Questions</p>
+        </div>
+        <div class="stat">
+            <h2 id="bestScore">0%</h2>
+            <p>Best Score</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Enter Your Name</h3>
+        <input id="studentName" type="text" placeholder="Enter your name">
+    </div>
+
+    <h2 class="section-title">Choose Your Quiz</h2>
+    <div class="subjects" id="subjectList"></div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:25px">
+        <button onclick="showLeaderboard()">🏆 Leaderboard</button>
+        <button class="secondary" onclick="showAdmin()">⚙️ Admin Panel</button>
+    </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quizScreen">
+    <div class="card">
+        <div class="quiz-top">
+            <h3 id="quizTitle">Quiz</h3>
+            <div class="timer">⏱ <span id="timer">05:00</span></div>
+        </div>
+
+        <p id="questionCount">Question 1</p>
+
+        <div class="progress-bg">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <h2 id="questionText"></h2>
+        <div id="options"></div>
+
+        <div class="quiz-buttons">
+            <button class="secondary" onclick="previousQuestion()" id="prevBtn">Previous</button>
+            <button onclick="nextQuestion()" id="nextBtn">Next</button>
+        </div>
+    </div>
+</section>
+
+<!-- RESULT -->
+<section id="resultScreen">
+    <div class="card" style="text-align:center">
+        <div style="font-size:55px">🎉</div>
+        <h1>Quiz Completed!</h1>
+        <p id="resultMessage" style="margin-top:10px"></p>
+        <div class="result-score" id="scoreText">0%</div>
+        <h3 id="marksText"></h3>
+        <p id="feedback" style="margin:15px"></p>
+        <button onclick="goHome()">Back to Home</button>
+        <button class="secondary" onclick="showLeaderboard()">Leaderboard</button>
+    </div>
+</section>
+
+<!-- LEADERBOARD -->
+<section id="leaderboardScreen">
+    <div class="card">
+        <h2>🏆 Leaderboard</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Student</th>
+                        <th>Quiz</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+        </div>
+        <button style="margin-top:20px" onclick="goHome()">Back Home</button>
+    </div>
+</section>
+
+<!-- ADMIN -->
+<section id="adminScreen">
+    <div class="card">
+        <h2>⚙️ Admin Panel</h2>
+        <p style="color:#64748b;margin:10px 0 20px">
+            Add your own quiz questions.
+        </p>
+
+        <form id="questionForm">
+            <label>Subject</label>
+            <select id="adminSubject" required></select>
+
+            <label>Question</label>
+            <input id="newQuestion" required placeholder="Enter question">
+
+            <label>Option A</label>
+            <input id="optionA" required placeholder="Option A">
+
+            <label>Option B</label>
+            <input id="optionB" required placeholder="Option B">
+
+            <label>Option C</label>
+            <input id="optionC" required placeholder="Option C">
+
+            <label>Option D</label>
+            <input id="optionD" required placeholder="Option D">
+
+            <label>Correct Answer</label>
+            <select id="correctAnswer">
+                <option value="0">Option A</option>
+                <option value="1">Option B</option>
+                <option value="2">Option C</option>
+                <option value="3">Option D</option>
+            </select>
+
+            <button type="submit">Add Question</button>
+        </form>
+
+        <h3 style="margin-top:25px">Added Questions</h3>
+        <div id="adminQuestions"></div>
+
+        <button class="secondary" onclick="goHome()" style="margin-top:20px">
+            Back Home
+        </button>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <p>© 2026 QuizMaster | Online Quiz Management System</p>
+    <p style="margin-top:6px">Developed by IT Student</p>
+</footer>
+
+<script>
+// Default quiz questions
+const defaultQuestions = {
+    "HTML": [
+        {q:"What does HTML stand for?",o:["Hyper Text Markup Language","High Text Machine Language","Hyper Tool Multi Language","Home Text Markup Language"],a:0},
+        {q:"Which tag creates a paragraph?",o:["<h1>","<p>","<div>","<br>"],a:1},
+        {q:"Which tag is used for an image?",o:["<img>","<image>","<pic>","<src>"],a:0},
+        {q:"Which tag creates a hyperlink?",o:["<link>","<a>","<href>","<url>"],a:1},
+        {q:"Which tag creates the largest heading?",o:["<h6>","<head>","<h1>","<title>"],a:2}
+    ],
+    "JavaScript": [
+        {q:"Which keyword declares a variable?",o:["var","int","string","define"],a:0},
+        {q:"Which symbol is used for comments?",o:["##","//","**","@@"] ,a:1},
+        {q:"Which function displays a message?",o:["print()","show()","alert()","writeMessage()"],a:2},
+        {q:"Which type represents true or false?",o:["String","Boolean","Number","Array"],a:1},
+        {q:"Which method selects an element by ID?",o:["getElementById()","getElement()","selectId()","findId()"],a:0}
+    ],
+    "Computer": [
+        {q:"What is the brain of a computer?",o:["Monitor","Keyboard","CPU","Mouse"],a:2},
+        {q:"Which device is used for typing?",o:["Mouse","Keyboard","Printer","Speaker"],a:1},
+        {q:"What does RAM stand for?",o:["Read Access Memory","Random Access Memory","Run Active Memory","Rapid Action Memory"],a:1},
+        {q:"Which is an operating system?",o:["Windows","Google","HTML","Mouse"],a:0},
+        {q:"Which device displays output?",o:["Monitor","Keyboard","Scanner","Microphone"],a:0}
+    ],
+    "Database": [
+        {q:"What does DBMS stand for?",o:["Data Basic Management System","Database Management System","Digital Base Memory System","Data Backup Management Software"],a:1},
+        {q:"Which language is used to query databases?",o:["HTML","CSS","SQL","C"],a:2},
+        {q:"What is a primary key?",o:["Duplicate value","Unique identifier","Empty field","Table name"],a:1},
+        {q:"Which command retrieves data?",o:["INSERT","DELETE","SELECT","UPDATE"],a:2},
+        {q:"What is a row in a database table called?",o:["Field","Record","Column","Key"],a:1}
+    ]
+};
+
+let questions = JSON.parse(localStorage.getItem("quizQuestions")) || defaultQuestions;
+let leaderboard = JSON.parse(localStorage.getItem("quizLeaderboard")) || [];
+
+let currentQuiz = "";
+let currentIndex = 0;
+let answers = [];
+let timeLeft = 300;
+let timerInterval = null;
+
+function saveData() {
+    localStorage.setItem("quizQuestions", JSON.stringify(questions));
+    localStorage.setItem("quizLeaderboard", JSON.stringify(leaderboard));
+}
+
+function updateDashboard() {
+    let categories = Object.keys(questions);
+    let total = categories.reduce((sum, key) => sum + questions[key].length, 0);
+
+    document.getElementById("totalQuizzes").textContent = categories.length;
+    document.getElementById("totalQuestions").textContent = total;
+
+    let best = leaderboard.length
+        ? Math.max(...leaderboard.map(x => x.score))
+        : 0;
+
+    document.getElementById("bestScore").textContent = best + "%";
+
+    document.getElementById("subjectList").innerHTML = categories.map((name, i) => `
+        <div class="subject">
+            <div class="emoji">${["🌐","💻","🖥️","🗄️"][i % 4]}</div>
+            <h3>${escapeHTML(name)}</h3>
+            <p>${questions[name].length} Questions | 5 Minutes</p>
+            <button onclick="startQuiz('${encodeURIComponent(name)}')">Start Quiz →</button>
+        </div>
+    `).join("");
+
+    document.getElementById("adminSubject").innerHTML = categories.map(name =>
+        `<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`
+    ).join("");
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    })[c]);
+}
+
+function showScreen(id) {
+    ["homeScreen","quizScreen","resultScreen","adminScreen","leaderboardScreen"]
+        .forEach(screen => document.getElementById(screen).style.display = "none");
+
+    document.getElementById(id).style.display = "block";
+}
+
+function startQuiz(encodedName) {
+    let name = document.getElementById("studentName").value.trim();
+
+    if (!name) {
+        alert("Please enter your name first!");
+        document.getElementById("studentName").focus();
+        return;
+    }
+
+    currentQuiz = decodeURIComponent(encodedName);
+    currentIndex = 0;
+    answers = new Array(questions[currentQuiz].length).fill(null);
+    timeLeft = 300;
+
+    showScreen("quizScreen");
+    document.getElementById("quizTitle").textContent = currentQuiz + " Quiz";
+
+    renderQuestion();
+    startTimer();
+}
+
+function renderQuestion() {
+    let q = questions[currentQuiz][currentIndex];
+
+    document.getElementById("questionCount").textContent =
+        `Question ${currentIndex + 1} of ${questions[currentQuiz].length}`;
+
+    document.getElementById("questionText").textContent = q.q;
+
+    document.getElementById("progress").style.width =
+        ((currentIndex + 1) / questions[currentQuiz].length * 100) + "%";
+
+    document.getElementById("options").innerHTML = q.o.map((option, i) => `
+        <button class="option ${answers[currentIndex] === i ? "selected" : ""}"
+            onclick="selectAnswer(${i})">
+            ${String.fromCharCode(65+i)}. ${escapeHTML(option)}
+        </button>
+    `).join("");
+
+    document.getElementById("prevBtn").disabled = currentIndex === 0;
+
+    document.getElementById("nextBtn").textContent =
+        currentIndex === questions[currentQuiz].length - 1
+        ? "Submit Quiz ✓" : "Next →";
+}
+
+function selectAnswer(index) {
+    answers[currentIndex] = index;
+    renderQuestion();
+}
+
+function previousQuestion() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+    }
+}
+
+function nextQuestion() {
+    if (currentIndex < questions[currentQuiz].length - 1) {
+        currentIndex++;
+        renderQuestion();
+    } else {
+        if (answers.includes(null)) {
+            if (!confirm("Some questions are unanswered. Submit anyway?")) return;
+        }
+        finishQuiz();
+    }
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+
+        document.getElementById("timer").textContent =
+            String(minutes).padStart(2,"0") + ":" +
+            String(seconds).padStart(2,"0");
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            finishQuiz();
+        }
+    }, 1000);
+}
+
+function finishQuiz() {
+    clearInterval(timerInterval);
+
+    let correct = 0;
+
+    questions[currentQuiz].forEach((q, i) => {
+        if (answers[i] === q.a) correct++;
+    });
+
+    let percentage = Math.round(correct / questions[currentQuiz].length * 100);
+
+    leaderboard.push({
+        name: document.getElementById("studentName").value.trim(),
+        quiz: currentQuiz,
+        score: percentage,
+        date: new Date().toLocaleDateString()
+    });
+
+    leaderboard.sort((a,b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 20);
+    saveData();
+
+    document.getElementById("resultMessage").textContent =
+        "Well done, " + document.getElementById("studentName").value + "!";
+
+    document.getElementById("scoreText").textContent = percentage + "%";
+    document.getElementById("marksText").textContent =
+        correct + " / " + questions[currentQuiz].length + " Correct Answers";
+
+    document.getElementById("feedback").textContent =
+        percentage >= 80 ? "Excellent work! 🌟" :
+        percentage >= 50 ? "Good effort! Keep practicing. 👍" :
+        "Keep learning. You can do better! 💪";
+
+    showScreen("resultScreen");
+    updateDashboard();
+}
+
+function showLeaderboard() {
+    let body = document.getElementById("leaderboardBody");
+
+    body.innerHTML = leaderboard.length
+        ? leaderboard.map((item, i) => `
+            <tr>
+                <td>${i+1}</td>
+                <td>${escapeHTML(item.name)}</td>
+                <td>${escapeHTML(item.quiz)}</td>
+                <td>${item.score}%</td>
+            </tr>
+        `).join("")
+        : `<tr><td colspan="4">No quiz results yet.</td></tr>`;
+
+    showScreen("leaderboardScreen");
+}
+
+function showAdmin() {
+    updateAdminQuestions();
+    showScreen("adminScreen");
+}
+
+document.getElementById("questionForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    let subject = document.getElementById("adminSubject").value;
+
+    if (!subject) {
+        alert("No subject available.");
+        return;
+    }
+
+    let question = {
+        q: document.getElementById("newQuestion").value.trim(),
+        o: [
+            document.getElementById("optionA").value.trim(),
+            document.getElementById("optionB").value.trim(),
+            document.getElementById("optionC").value.trim(),
+            document.getElementById("optionD").value.trim()
+        ],
+        a: Number(document.getElementById("correctAnswer").value)
+    };
+
+    questions[subject].push(question);
+    saveData();
+
+    this.reset();
+    updateDashboard();
+    updateAdminQuestions();
+
+    alert("Question added successfully!");
+});
+
+function updateAdminQuestions() {
+    let list = document.getElementById("adminQuestions");
+
+    list.innerHTML = Object.keys(questions).map(subject => `
+        <h4 style="margin-top:15px">${escapeHTML(subject)}</h4>
+        ${questions[subject].map((q, i) => `
+            <div class="admin-question">
+                ${escapeHTML(q.q)}
+                <button class="danger" style="float:right;padding:6px 10px"
+                    onclick="deleteQuestion('${encodeURIComponent(subject)}',${i})">
+                    Delete
+                </button>
+            </div>
+        `).join("")}
+    `).join("");
+}
+
+function deleteQuestion(encodedSubject, index) {
+    let subject = decodeURIComponent(encodedSubject);
+
+    if (!confirm("Delete this question?")) return;
+
+    questions[subject].splice(index, 1);
+    saveData();
+    updateDashboard();
+    updateAdminQuestions();
+}
+
+function goHome() {
+    clearInterval(timerInterval);
+    updateDashboard();
+    showScreen("homeScreen");
+}
+
+updateDashboard();
+</script>
+
+</body>
+</html>
